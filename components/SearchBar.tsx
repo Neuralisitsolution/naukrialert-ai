@@ -25,7 +25,7 @@ export default function SearchBar({ className = '' }: { className?: string }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search jobs by title, organization, exam name..."
-          className="w-full rounded-xl border border-gray-300 bg-white py-3.5 pl-12 pr-28 text-sm shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+          className="w-full rounded-xl border border-gray-300 bg-white py-3.5 pl-12 pr-28 text-sm text-gray-900 caret-gray-900 placeholder:text-gray-400 shadow-sm transition focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
         />
         <button
           type="submit"
