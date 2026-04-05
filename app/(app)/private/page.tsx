@@ -17,7 +17,7 @@ export default function PrivateMembersPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ name: '', phone: '', address: '', notes: '' });
+  const [form, setForm] = useState({ name: '', phone: '', address: '', notes: '', email: '', password: '' });
 
   const fetchMembers = async () => {
     try {
@@ -47,7 +47,7 @@ export default function PrivateMembersPage() {
       if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
       toast.success('Member added!');
       setShowModal(false);
-      setForm({ name: '', phone: '', address: '', notes: '' });
+      setForm({ name: '', phone: '', address: '', notes: '', email: '', password: '' });
       fetchMembers();
     } catch (err: any) {
       toast.error(err.message || 'Failed to add member');
@@ -114,6 +114,19 @@ export default function PrivateMembersPage() {
             <label className="label">Notes</label>
             <input type="text" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="input-field" placeholder="Optional" />
           </div>
+
+          <div className="border-t border-gray-200 pt-3 mt-3">
+            <p className="text-xs text-gray-500 mb-3">Login credentials - these let the member sign in to submit payments</p>
+            <div>
+              <label className="label">Login Email</label>
+              <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="input-field" placeholder="member@example.com" />
+            </div>
+            <div className="mt-3">
+              <label className="label">Login Password</label>
+              <input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className="input-field" placeholder="Min 6 characters" />
+            </div>
+          </div>
+
           <button type="submit" disabled={saving} className="btn-primary w-full">{saving ? 'Saving...' : 'Add Member'}</button>
         </form>
       </Modal>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import bcrypt from 'bcryptjs';
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -98,10 +99,37 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { name, phone, address, notes, userId } = body;
+    const { name, phone, address, notes, email, password } = body;
 
     if (!name?.trim()) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+    }
+
+    let userId: string | null = null;
+
+    // Create a login account if email and password are provided
+    if (email?.trim() && password) {
+      if (password.length < 6) {
+        return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 });
+      }
+
+      // Check if email already exists
+      const existingUser = await prisma.user.findUnique({ where: { email: email.trim() } });
+      if (existingUser) {
+        return NextResponse.json({ error: 'This email is already in use' }, { status: 409 });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = await prisma.user.create({
+        data: {
+          name: name.trim(),
+          email: email.trim(),
+          password: hashedPassword,
+          role: 'PRIVATE_MEMBER',
+          phone: phone?.trim() || null,
+        },
+      });
+      userId = user.id;
     }
 
     const member = await prisma.privateMember.create({
@@ -110,7 +138,7 @@ export async function POST(request: NextRequest) {
         phone: phone?.trim() || null,
         address: address?.trim() || null,
         notes: notes?.trim() || null,
-        userId: userId || null,
+        userId,
       },
     });
 
@@ -119,7 +147,7 @@ export async function POST(request: NextRequest) {
     console.error('Private POST error:', error);
     if (error.code === 'P2002') {
       return NextResponse.json(
-        { error: 'This user is already linked to a private member' },
+        { error: 'This email is already linked to another member' },
         { status: 409 }
       );
     }
