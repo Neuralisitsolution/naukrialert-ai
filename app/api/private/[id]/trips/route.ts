@@ -11,7 +11,12 @@ export async function POST(
   if (!session) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }
-  if ((session.user as any).role !== 'OWNER') {
+
+  const role = (session.user as any).role;
+  const privateMemberId = (session.user as any).privateMemberId;
+
+  // Owner can add trips for any member, member can only add for themselves
+  if (role !== 'OWNER' && (role !== 'PRIVATE_MEMBER' || privateMemberId !== params.id)) {
     return NextResponse.json({ error: 'Not authorized' }, { status: 403 });
   }
 

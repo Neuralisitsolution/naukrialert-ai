@@ -8,7 +8,7 @@ export default withAuth(
 
     // Private members can only access their own page and API
     if (token?.role === 'PRIVATE_MEMBER') {
-      const allowedPaths = ['/private/me', '/api/private', '/api/upload', '/settings'];
+      const allowedPaths = ['/private/me', '/api/private', '/api/upload', '/api/fleet', '/settings'];
       const isAllowed = allowedPaths.some((p) => path.startsWith(p));
 
       if (!isAllowed && !path.startsWith('/api/auth')) {
